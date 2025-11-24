@@ -30,7 +30,6 @@ KERNEL = bin/InfiniteOS.bin
 # --- 3. REGRAS PRINCIPAIS ---
 
 .PHONY: all clean run
-
 # Regra padrão: Compila tudo (o alvo é bin/InfiniteOS.bin)
 all: $(KERNEL)
 
