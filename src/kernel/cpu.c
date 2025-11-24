@@ -1,19 +1,54 @@
 /*
- * src/kernel/cpu.c (Futuro Arquivo)
-  * Função que adapta a entrada binária (do hardware) para a lógica quântica.
-   * Baseado no conceito 'Protocol Unified'.
-    */
-    Qubit_State_t unified_io_adapter(u32 binary_input) {
-        Qubit_State_t new_state;
-            
-                // Implementação Futura:
-                    // Esta é a função principal onde a lógica de mapeamento 'Golden Ratio'
-                        // converte a entrada binária (u32) em um Trit (Trit_Value) e define o timer.
-                            
-                                new_state.node.value = (binary_input % 3) ? TRIT_POSITIVE : TRIT_NEUTRAL; 
-                                    new_state.coherence_timer = 1000; // Define o tempo inicial de vida
-                                        new_state.security_level = 3;     // Nível máximo para dados de protocolo
-                                            
-                                                return new_state;
-                                                }
-                                                
+ * src/kernel/cpu.c - Inicialização de baixo nível da CPU e Funções de Controle.
+ */
+
+// 1. INCLUSÕES ESSENCIAIS
+#include "../../include/types.h" // CORREÇÃO: Define u32, Trit_Value, e Qubit_State_t
+
+// Se você tiver um arquivo de cabeçalho para a CPU (e.g., para a GDT, IDT), inclua-o aqui.
+// #include "../../include/arch/gdt.h"
+// #include "../../include/arch/idt.h" 
+
+// ----------------------------------------------------------------------
+// Variáveis e Funções de Teste (que causaram o erro)
+// ----------------------------------------------------------------------
+
+// Função de teste que utiliza o tipo Qubit_State_t
+// Isso simula a necessidade de inicializar a camada adaptativa
+void cpu_initialize_quantum_adapter(Qubit_State_t initial_state) {
+    
+    // Isso é um stub: 
+    // Em um SO real, inicializaria registradores, a GDT e a IDT.
+    
+    // Exemplo de uso do tipo (Para teste)
+    if (initial_state == QUBIT_ENTANGLED) {
+        // Envia log para o serial
+    }
+}
+
+
+// Função principal de inicialização da CPU
+void cpu_init() {
+    // 1. Configura a Memória e Registradores (GDT, Paging)
+    // gdt_init();
+    
+    // 2. Configura a Tabela de Interrupções (IDT)
+    // idt_init();
+    
+    // 3. Inicializa a camada quântica adaptativa (simulação)
+    cpu_initialize_quantum_adapter(QUBIT_NEUTRAL);
+}
+
+// Funções de I/O de baixo nível (Assembly inline)
+
+// Função (inline assembly) para enviar um byte para uma porta I/O
+u8 inb(u16 port) {
+    u8 data;
+    asm volatile("inb %1, %0" : "=a"(data) : "Nd"(port));
+    return data;
+}
+
+// Função (inline assembly) para ler um byte de uma porta I/O
+void outb(u16 port, u8 data) {
+    asm volatile("outb %0, %1" : : "a"(data), "Nd"(port));
+}
