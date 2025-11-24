@@ -4,23 +4,25 @@
 # ------------------------------------------------------------------------------
 
 # --- 1. CONFIGURAÇÃO DE FERRAMENTAS ---
-# IMPORTANTE: GCC/LD padrão (Solução de Emergência)
+# Usando GCC e LD padrão do Codespace
 CC = gcc
 AS = nasm
 LD = ld
 QEMU = qemu-system-i386
 
 # --- 2. VARIÁVEIS DE COMPILAÇÃO ---
-# Flags essenciais para um Kernel: não usar bibliotecas C padrão (ffreestanding)
+# Flags essenciais para um Kernel: -ffreestanding (sem biblioteca padrão C)
 CFLAGS = -Wall -Wextra -std=gnu99 -ffreestanding -O2 -g
-CFLAGS += -m32 # Garante que o GCC compile para 32-bit (i386)
-CFLAGS += -I./include  # Inclui a pasta de cabeçalhos
-LDFLAGS = -T boot/linker.ld -m elf_i386 # Define o formato de saída como 32-bit
+CFLAGS += -m32                       # Tenta forçar a compilação para 32-bit (i386)
+CFLAGS += -I./include                # Inclui a pasta de cabeçalhos
+LDFLAGS = -T boot/linker.ld 
+LDFLAGS += -m elf_i386                # Define o formato de saída do Linker como 32-bit (ELF)
 
 # Localiza todos os arquivos C nas pastas principais
 C_FILES = $(wildcard src/kernel/*.c)
 C_FILES += $(wildcard src/drivers/*.c)
 C_FILES += $(wildcard src/lib/*.c)
+C_FILES += $(wildcard src/arch/*.c)   # Incluindo a nova pasta para CPU/IDT
 C_OBJECTS = $(patsubst %.c, %.o, $(C_FILES))
 
 # Nome do arquivo final do kernel
@@ -30,14 +32,15 @@ KERNEL = bin/InfiniteOS.bin
 
 .PHONY: all clean run
 
-# Regra padrão: Compila tudo
+# Regra padrão: Compila tudo (o alvo é bin/InfiniteOS.bin)
 all: $(KERNEL)
 
 # Regra para compilar o kernel (bin/InfiniteOS.bin)
-$(KERNEL): $(C_OBJECTS) boot/boot.o
+$(KERNEL): $(C_OBJECTS) boot/boot.o boot/interrupts.o
 	@mkdir -p bin
 	@echo "-> Linking the InfiniteOS Kernel..."
-	$(LD) $(LDFLAGS) boot/boot.o $(C_OBJECTS) -o bin/kernel.elf
+	# Linka o boot.o, os objetos C, e o interrupts.o
+	$(LD) $(LDFLAGS) boot/boot.o boot/interrupts.o $(C_OBJECTS) -o bin/kernel.elf
 	
 	# Move o arquivo ELF para ser carregado pelo QEMU
 	mv bin/kernel.elf $(KERNEL)
@@ -56,15 +59,23 @@ boot/boot.o: boot/boot.asm
 	@echo "-> Assembling Bootloader: $<"
 	$(AS) $< -f elf -o $@
 
+# Regra para Assembly de Interrupções (Novo arquivo)
+boot/interrupts.o: boot/interrupts.asm
+	@echo "-> Assembling Interrupts: $<"
+	$(AS) $< -f elf -o $@
+
+
 # --- 5. REGRAS DE EXECUÇÃO E LIMPEZA ---
 
 # Executa o Kernel no Emulador QEMU
 run: all
 	@echo "--- Executando o InfiniteOS no QEMU ---"
+	# -serial stdio: Conecta a porta serial (para o log de debug) ao seu terminal
 	$(QEMU) -fda $(KERNEL) -m 64 -cpu pentium -serial stdio -no-reboot
 	@echo "--- Teste Concluído ---"
 
 # Limpa todos os arquivos gerados
 clean:
 	@echo "-> Cleaning up build files..."
-	rm -rf bin *.o src/kernel/*.o src/drivers/*.o src/lib/*.o boot/*.o
+	rm -rf bin *.o src/kernel/*.o src/drivers/*.o src/lib/*.o src/arch/*.o boot/*.o
+
