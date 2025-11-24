@@ -14,7 +14,24 @@
    typedef unsigned long long u64; // 64-bit unsigned integer
 
    // --- 2. Tipos de Abstração Pré-Quantum (Golden Ratio Kernel) ---
+/*
+ * Struct para gerenciar o estado e a coerência do qubit/trit lógico.
+  * Baseado no conceito 'Indefinite Coherence'.
+   */
+   typedef struct {
+       Quantum_Node_t node; // O valor ternário real (o Trit)
 
+           u32 coherence_timer; // Um contador de ciclos de CPU para medir a coerência
+                                    // Em hardware quântico real, seria um tempo físico (T2).
+
+                                        u8 security_level;   // Nível de segurança (0 = baixa, 3 = alta).
+                                                                 // Usado pelo Protocol Unified para determinar a criptografia.
+
+                                                                     // Implementação Futura: Ponteiro para a rotina de 'refresh' da coerência
+                                                                         void (*coherence_refresh_func)(); 
+                                                                             
+                                                                             } Qubit_State_t;
+                                                                             
    /*
     * Estrutura Base para representar um TRIT (Valor Ternário).
      * Um TRIT requer 2 bits (u8) para armazenar 3 estados (-1, 0, +1).
