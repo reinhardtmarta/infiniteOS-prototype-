@@ -1,20 +1,21 @@
 # ------------------------------------------------------------------------------
 # Makefile para o InfiniteOS - GOLDEN RATIO QUANTUM KERNEL
-# Define comandos para compilar o kernel e o bootloader.
+# SOLUÇÃO DE EMERGÊNCIA: Usa ferramentas padrão (gcc, ld) devido a restrições do ambiente.
 # ------------------------------------------------------------------------------
 
 # --- 1. CONFIGURAÇÃO DE FERRAMENTAS ---
-# IMPORTANTE: Essas ferramentas (cross-compiler) devem estar instaladas
-CC = i686-elf-gcc
+# IMPORTANTE: GCC/LD padrão (Solução de Emergência)
+CC = gcc
 AS = nasm
-LD = i686-elf-ld
-OBJCOPY = i686-elf-objcopy
+LD = ld
 QEMU = qemu-system-i386
 
 # --- 2. VARIÁVEIS DE COMPILAÇÃO ---
+# Flags essenciais para um Kernel: não usar bibliotecas C padrão (ffreestanding)
 CFLAGS = -Wall -Wextra -std=gnu99 -ffreestanding -O2 -g
+CFLAGS += -m32 # Garante que o GCC compile para 32-bit (i386)
 CFLAGS += -I./include  # Inclui a pasta de cabeçalhos
-LDFLAGS = -T boot/linker.ld
+LDFLAGS = -T boot/linker.ld -m elf_i386 # Define o formato de saída como 32-bit
 
 # Localiza todos os arquivos C nas pastas principais
 C_FILES = $(wildcard src/kernel/*.c)
