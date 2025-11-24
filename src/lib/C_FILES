@@ -1,0 +1,9 @@
+# ANTES:
+C_FILES = $(wildcard src/kernel/*.c)
+C_FILES += $(wildcard src/drivers/*.c)
+
+# DEPOIS (ADICIONAR a nova linha abaixo):
+C_FILES = $(wildcard src/kernel/*.c)
+C_FILES += $(wildcard src/drivers/*.c)
+C_FILES += $(wildcard src/lib/*.c)  # ADICIONADO: Inclui a lógica ternária
+C_OBJECTS = $(patsubst %.c, %.o, $(C_FILES))
