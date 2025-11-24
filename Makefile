@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Makefile para o InfiniteOS - GOLDEN RATIO QUANTUM KERNEL
-# SOLUÇÃO FINAL: Removida a flag problemática do linker para rodar no Codespace.
+# VERSÃO OTIMIZADA: Remoção de flags que causam erro no ambiente Codespace.
 # ------------------------------------------------------------------------------
 
 # --- 1. CONFIGURAÇÃO DE FERRAMENTAS ---
@@ -13,9 +13,11 @@ QEMU = qemu-system-i386
 # --- 2. VARIÁVEIS DE COMPILAÇÃO ---
 # Flags essenciais: -ffreestanding (sem biblioteca padrão C)
 CFLAGS = -Wall -Wextra -std=gnu99 -ffreestanding -O2 -g
-CFLAGS += -m32                       # Tenta forçar a compilação para 32-bit (i386)
+# -m32 foi removida para evitar o erro do Codespace GCC.
 CFLAGS += -I./include                # Inclui a pasta de cabeçalhos
-LDFLAGS = -T boot/linker.ld          # O Linker Script define o formato de 32-bit
+
+# O Linker Script define o formato de 32-bit.
+LDFLAGS = -T boot/linker.ld
 
 # Localiza todos os arquivos C nas pastas principais
 C_FILES = $(wildcard src/kernel/*.c)
@@ -30,6 +32,7 @@ KERNEL = bin/InfiniteOS.bin
 # --- 3. REGRAS PRINCIPAIS ---
 
 .PHONY: all clean run
+
 # Regra padrão: Compila tudo (o alvo é bin/InfiniteOS.bin)
 all: $(KERNEL)
 
