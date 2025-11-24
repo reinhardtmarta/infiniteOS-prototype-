@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Makefile para o InfiniteOS - GOLDEN RATIO QUANTUM KERNEL
-# SOLUÇÃO DE EMERGÊNCIA: Usa ferramentas padrão (gcc, ld) devido a restrições do ambiente.
+# SOLUÇÃO FINAL: Removida a flag problemática do linker para rodar no Codespace.
 # ------------------------------------------------------------------------------
 
 # --- 1. CONFIGURAÇÃO DE FERRAMENTAS ---
@@ -11,18 +11,17 @@ LD = ld
 QEMU = qemu-system-i386
 
 # --- 2. VARIÁVEIS DE COMPILAÇÃO ---
-# Flags essenciais para um Kernel: -ffreestanding (sem biblioteca padrão C)
+# Flags essenciais: -ffreestanding (sem biblioteca padrão C)
 CFLAGS = -Wall -Wextra -std=gnu99 -ffreestanding -O2 -g
 CFLAGS += -m32                       # Tenta forçar a compilação para 32-bit (i386)
 CFLAGS += -I./include                # Inclui a pasta de cabeçalhos
-LDFLAGS = -T boot/linker.ld 
-LDFLAGS += -m elf_i386                # Define o formato de saída do Linker como 32-bit (ELF)
+LDFLAGS = -T boot/linker.ld          # O Linker Script define o formato de 32-bit
 
 # Localiza todos os arquivos C nas pastas principais
 C_FILES = $(wildcard src/kernel/*.c)
 C_FILES += $(wildcard src/drivers/*.c)
 C_FILES += $(wildcard src/lib/*.c)
-C_FILES += $(wildcard src/arch/*.c)   # Incluindo a nova pasta para CPU/IDT
+C_FILES += $(wildcard src/arch/*.c)   # Incluindo a pasta para CPU/IDT
 C_OBJECTS = $(patsubst %.c, %.o, $(C_FILES))
 
 # Nome do arquivo final do kernel
@@ -78,4 +77,3 @@ run: all
 clean:
 	@echo "-> Cleaning up build files..."
 	rm -rf bin *.o src/kernel/*.o src/drivers/*.o src/lib/*.o src/arch/*.o boot/*.o
-
