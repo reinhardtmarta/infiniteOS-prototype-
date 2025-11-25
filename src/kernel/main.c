@@ -1,5 +1,5 @@
 // src/kernel/main.c
-#include "../include/vga.h"
+#include "include/vga.h"
 
 void kernel_main(void)
 {
