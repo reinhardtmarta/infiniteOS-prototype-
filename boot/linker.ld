@@ -2,10 +2,13 @@ ENTRY(start)
 
 SECTIONS
 {
-    . = 0x100000;              /* Kernel começa em 1MB (depois do real mode) */
+    . = 0x100000;             /* kernel começa aqui */
 
     .text : {
         *(.text)
+    }
+
+    .rodata : {
         *(.rodata*)
     }
 
@@ -16,10 +19,5 @@ SECTIONS
     .bss : {
         *(COMMON)
         *(.bss)
-    }
-
-    /DISCARD/ : {
-        *(.eh_frame)
-        *(.comment)
     }
 }
