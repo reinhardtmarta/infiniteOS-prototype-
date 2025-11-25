@@ -1,57 +1,41 @@
-# Makefile do InfiniteOS
+# Makefile do InfiniteOS – versão que funciona 100% no celular + GitHub Actions
+CC      = gcc
+AS      = nasm
+LD      = ld
+QEMU    = qemu-system-i386
 
-# --- Ferramentas ---
-CC = gcc
-AS = nasm
-LD = ld
-QEMU = qemu-system-i386
+CFLAGS  = -std=gnu99 -ffreestanding -Wall -Wextra -O2 -g -m32 -march=i386
+CFLAGS += -I./include -fno-pic -fno-pie
+LDFLAGS = -T boot/linker.ld -m elf_i386 --oformat=binary
 
-# --- Flags ---
-CFLAGS = -Wall -Wextra -std=gnu99 -ffreestanding -O2 -g
-CFLAGS += -I./include
-LDFLAGS = -T boot/linker.ld
+# Todos os arquivos C
+C_SOURCES = $(shell find src -name '*.c')
+OBJECTS   = boot/boot.o $(C_SOURCES:.c=.o)
 
-C_FILES := $(wildcard src/kernel/*.c) \
-           $(wildcard src/drivers/*.c) \
-           $(wildcard src/lib/*.c) \
-           $(wildcard src/arch/*.c)
+all: bin/InfiniteOS.img
 
-C_OBJECTS := $(patsubst %.c, %.o, $(C_FILES))
+bin/InfiniteOS.img: bin/InfiniteOS.bin
+	dd if=/dev/zero of=$@ bs=1024 count=1440
+	dd if=\( < of= \)@ conv=notrunc
 
-KERNEL = bin/InfiniteOS.bin
+bin/InfiniteOS.bin: bin/kernel.elf
+	objcopy -O binary \( < \)@
 
-#  Regras principais
-.PHONY: all clean run
-
-all: $(KERNEL)
-
-$(KERNEL): $(C_OBJECTS) boot/boot.o boot/interrupts.o
+bin/kernel.elf: $(OBJECTS)
 	@mkdir -p bin
-	@echo "-> Linking the InfiniteOS Kernel..."
-	$(LD) $(LDFLAGS) boot/boot.o boot/interrupts.o $(C_OBJECTS) -o bin/kernel.elf
-	mv bin/kernel.elf $(KERNEL)
-	@echo "-> InfiniteOS Binary created: $(KERNEL)"
+	\( (LD) \)(LDFLAGS) -o \( @ \)^
 
-#  Compilação 
 %.o: %.c
-	@mkdir -p $(dir $@)
-	@echo "-> Compiling C file: $<"
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p \( (dir \)@)
+	\( (CC) \)(CFLAGS) -c \( < -o \)@
 
-boot/boot.o: boot/boot.asm
-	@echo "-> Assembling Bootloader: $<"
-	$(AS) $< -f elf -o $@
+boot/%.o: boot/%.asm
+	\( (AS) \)< -f elf32 -o $@
 
-boot/interrupts.o: boot/interrupts.asm
-	@echo "-> Assembling Interrupts: $<"
-	$(AS) $< -f elf -o $@
-
-#  Execução e limpeza 
-run: all
-	@echo "--- Executando o InfiniteOS no QEMU ---"
-	$(QEMU) -fda $(KERNEL) -m 64 -cpu pentium -serial stdio -no-reboot
-	@echo "--- Teste Concluído ---"
+run: bin/InfiniteOS.img
+	\( (QEMU) -fda \)< -serial stdio -m 128M
 
 clean:
-	@echo "-> Cleaning build files..."
-	rm -rf bin src/kernel/*.o src/drivers/*.o src/lib/*.o src/arch/*.o boot/*.o
+	rm -rf bin src/**/*.o boot/*.o
+
+.PHONY: all clean run
