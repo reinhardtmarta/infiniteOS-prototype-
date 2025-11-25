@@ -1,15 +1,15 @@
-# Makefile do InfiniteOS – versão que funciona 100% no celular + GitHub Actions
+# Makefile do InfiniteOS - versão que NUNCA dá erro de sintaxe no celular
+
 CC      = gcc
 AS      = nasm
 LD      = ld
 QEMU    = qemu-system-i386
+OBJCOPY = objcopy
 
-CFLAGS  = -std=gnu99 -ffreestanding -Wall -Wextra -O2 -g -m32 -march=i386
-CFLAGS += -I./include -fno-pic -fno-pie
-LDFLAGS = -T boot/linker.ld -m elf_i386 --oformat=binary
+CFLAGS  = -std=gnu99 -ffreestanding -Wall -Wextra -O2 -g -m32 -march=i386 -I./include
+LDFLAGS = -T boot/linker.ld -m elf_i386
 
-# Todos os arquivos C
-C_SOURCES = $(shell find src -name '*.c')
+C_SOURCES = $(shell find src -name '*.c' 2>/dev/null || echo "")
 OBJECTS   = boot/boot.o $(C_SOURCES:.c=.o)
 
 all: bin/InfiniteOS.img
@@ -19,21 +19,21 @@ bin/InfiniteOS.img: bin/InfiniteOS.bin
 	dd if=\( < of= \)@ conv=notrunc
 
 bin/InfiniteOS.bin: bin/kernel.elf
-	objcopy -O binary \( < \)@
+	\( (OBJCOPY) -O binary \)< $@
 
 bin/kernel.elf: $(OBJECTS)
-	@mkdir -p bin
+	mkdir -p bin
 	\( (LD) \)(LDFLAGS) -o \( @ \)^
 
 %.o: %.c
-	@mkdir -p \( (dir \)@)
+	mkdir -p \( (dir \)@)
 	\( (CC) \)(CFLAGS) -c \( < -o \)@
 
 boot/%.o: boot/%.asm
 	\( (AS) \)< -f elf32 -o $@
 
 run: bin/InfiniteOS.img
-	\( (QEMU) -fda \)< -serial stdio -m 128M
+	\( (QEMU) -fda \)< -serial stdio -m 128M -no-reboot
 
 clean:
 	rm -rf bin src/**/*.o boot/*.o
