@@ -1,10 +1,10 @@
-CC      = gcc
-AS      = nasm
-LD      = ld
-QEMU    = qemu-system-i386
+CC = gcc
+AS = nasm
+LD = ld
+QEMU = qemu-system-i386
 OBJCOPY = objcopy
 
-CFLAGS  = -std=gnu99 -ffreestanding -Wall -Wextra -O2 -g -m32 -march=i386 -I./include
+CFLAGS = -std=gnu99 -ffreestanding -Wall -Wextra -O2 -g -m32 -march=i386 -I./include
 LDFLAGS = -T boot/linker.ld -m elf_i386
 
 all: bin/InfiniteOS.img
@@ -14,27 +14,27 @@ bin/InfiniteOS.img: bin/InfiniteOS.bin
 	dd if=\( < of= \)@ conv=notrunc
 
 bin/InfiniteOS.bin: bin/kernel.elf
-	\( (OBJCOPY) -O binary \)< $@
+	$(OBJCOPY) -O binary bin/kernel.elf bin/InfiniteOS.bin
 
-bin/kernel.elf: boot/boot.o src/kernel/cpu.o src/drivers/vga.o src/lib/*.o
+bin/kernel.elf: boot/boot.o src/kernel/cpu.o src/drivers/vga.o
 	mkdir -p bin
-	\( (LD) \)(LDFLAGS) -o \( @ \)^
+	\( (LD) \)(LDFLAGS) -o bin/kernel.elf boot/boot.o src/kernel/cpu.o src/drivers/vga.o
 
 src/kernel/cpu.o: src/kernel/cpu.c
 	mkdir -p src/kernel
-	\( (CC) \)(CFLAGS) -c \( < -o \)@
+	gcc $(CFLAGS) -c src/kernel/cpu.c -o src/kernel/cpu.o
 
 src/drivers/vga.o: src/drivers/vga.c
 	mkdir -p src/drivers
-	\( (CC) \)(CFLAGS) -c \( < -o \)@
+	gcc $(CFLAGS) -c src/drivers/vga.c -o src/drivers/vga.o
 
 boot/boot.o: boot/boot.asm
-	$(AS) -f elf32 boot/boot.asm -o boot/boot.o
+	nasm -f elf32 boot/boot.asm -o boot/boot.o
 
 run: bin/InfiniteOS.img
-	\( (QEMU) -fda \)< -serial stdio -m 128M -no-reboot
+	$(QEMU) -fda bin/InfiniteOS.img -serial stdio -m 128M -no-reboot
 
 clean:
-	rm -rf bin boot/*.o src/*/*.o src/*/*/*.o
+	rm -rf bin boot/*.o src/*/*.o
 
 .PHONY: all clean run
