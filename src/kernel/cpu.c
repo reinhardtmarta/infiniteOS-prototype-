@@ -3,12 +3,12 @@
  */
 
 // 1. INCLUSÕES ESSENCIAIS
-#include "../../include/types.h" // CORREÇÃO: Define u32, Trit_Value, e Qubit_State_t
-
+#include <stdint.h>
+#include <quantum/types.h>
 // Se você tiver um arquivo de cabeçalho para a CPU (e.g., para a GDT, IDT), inclua-o aqui.
 // #include "../../include/arch/gdt.h"
 // #include "../../include/arch/idt.h" 
-
+//  #include "../../include/types.h"
 // ----------------------------------------------------------------------
 // Variáveis e Funções de Teste (que causaram o erro)
 // ----------------------------------------------------------------------
