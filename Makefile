@@ -1,5 +1,3 @@
-# Makefile do InfiniteOS - versão que NUNCA dá erro de sintaxe no celular
-
 CC      = gcc
 AS      = nasm
 LD      = ld
@@ -29,13 +27,13 @@ bin/kernel.elf: $(OBJECTS)
 	mkdir -p \( (dir \)@)
 	\( (CC) \)(CFLAGS) -c \( < -o \)@
 
-boot/%.o: boot/%.asm
-	\( (AS) \)< -f elf32 -o $@
+boot/boot.o: boot/boot.asm
+	$(AS) -f elf32 boot/boot.asm -o boot/boot.o
 
 run: bin/InfiniteOS.img
 	\( (QEMU) -fda \)< -serial stdio -m 128M -no-reboot
 
 clean:
-	rm -rf bin src/**/*.o boot/*.o
+	rm -rf bin *.o src/**/*.o boot/*.o
 
 .PHONY: all clean run
