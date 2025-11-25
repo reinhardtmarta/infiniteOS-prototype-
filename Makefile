@@ -7,9 +7,13 @@ bin/InfiniteOS.img: bin/InfiniteOS.bin
 bin/InfiniteOS.bin: bin/kernel.elf
 	objcopy -O binary bin/kernel.elf bin/InfiniteOS.bin
 
-bin/kernel.elf: boot/boot.o src/kernel/cpu.o src/drivers/vga.o
+bin/kernel.elf: boot/boot.o src/kernel/cpu.o src/drivers/vga.o src/kernel/main.o
 	mkdir -p bin
-	ld -T boot/linker.ld -m elf_i386 -o bin/kernel.elf boot/boot.o src/kernel/cpu.o src/drivers/vga.o
+	ld -T boot/linker.ld -m elf_i386 -o bin/kernel.elf boot/boot.o src/kernel/cpu.o src/drivers/vga.o src/kernel/main.o
+
+src/kernel/main.o: src/kernel/main.c
+	mkdir -p src/kernel
+	gcc -std=gnu99 -ffreestanding -Wall -Wextra -O2 -g -m32 -march=i386 -I./include -c src/kernel/main.c -o src/kernel/main.o
 
 src/kernel/cpu.o: src/kernel/cpu.c
 	mkdir -p src/kernel
