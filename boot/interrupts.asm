@@ -1,14 +1,11 @@
-; -----------------------------------------------------------------------------
-; boot/interrupts.asm - Funções de Assembly para a IDT
-; -----------------------------------------------------------------------------
+; ====================== boot/interrupts.asm ======================
 
-[BITS 32]
-; Extern: Funções C a serem chamadas
-extern idt_load_ptr
-
-; Função para carregar a IDT no processador
+; Certifique-se de que a função idt_load é global
 global idt_load
-idt_load:
-    ; Carrega o IDTR (Interrupt Descriptor Table Register)
-    lidt [idt_load_ptr] 
-    ret
+
+; Localize o ponteiro e adicione global:
+global idt_load_ptr ; <--- ADICIONE ISSO!
+
+idt_load_ptr:
+    dw 0x0000 ; Limite (tamanho da IDT - 1)
+    dd 0x00000000 ; Endereço base da IDT
