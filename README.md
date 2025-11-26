@@ -1,1 +1,1 @@
-# The prtotype of InfiniteOS 
+# The prototype of InfiniteOS 
