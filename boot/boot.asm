@@ -53,6 +53,7 @@ Modo_Protegido:
     ; Se o kernel retornar, parar a CPU
     cli
     hlt
+%include "boot/gdt.asm
 
 ; Inclua aqui o arquivo da GDT (depende do seu sistema de compilação)
 ; Se for um único arquivo, apenas coloque o código do gdt.asm no final.
