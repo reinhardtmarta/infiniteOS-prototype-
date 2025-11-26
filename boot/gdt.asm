@@ -1,42 +1,68 @@
 ; ============================================================
-; gdt.asm — Global Descriptor Table para InfiniteOS Prototype
+;   infiniteOS - GDT (Global Descriptor Table)
+;   Arquivo: boot/gdt.asm
 ; ============================================================
 
-BITS 16
+bits 16
 
-; -----------------------------
-; Estrutura da GDT (flat model)
-; -----------------------------
+global GDT_START
+global GDT_POINTER
+global GDT_CODE_SEG
+global GDT_DATA_SEG
+
+; ------------------------------------------------------------
+; Estrutura da GDT
+;   Entrada 0 = Null
+;   Entrada 1 = Code Segment
+;   Entrada 2 = Data Segment
+; ------------------------------------------------------------
 
 GDT_START:
 
-; 0x00 — NULL Descriptor (obrigatório)
-GDT_NULL:
-    dq 0
+; -----------------------------
+; 0: Null Descriptor
+; -----------------------------
+GDT_NULL_DESC:
+    dd 0x00000000
+    dd 0x00000000
 
-; 0x08 — Código 32-bit
+; -----------------------------
+; 1: Code Segment Descriptor
+; -----------------------------
 GDT_CODE_SEG:
-    dw 0xFFFF         ; Limit (15-0)
-    dw 0x0000         ; Base (15-0)
-    db 0x00           ; Base (23-16)
-    db 10011010b      ; Access: Code, Readable, Present
-    db 11001111b      ; Flags: 4K granularity, 32-bit
-    db 0x00           ; Base (31-24)
+    ; Base = 0x00000000
+    ; Limit = 0xFFFFF (4GB)
+    ; Granularity = 4KB
+    ; Execution, Readable
 
-; 0x10 — Dados 32-bit
+    dw 0xFFFF          ; Limit low
+    dw 0x0000          ; Base low
+    db 0x00            ; Base middle
+    db 10011010b       ; Access byte (code segment)
+    db 11001111b       ; Flags + limit high
+    db 0x00            ; Base high
+
+; -----------------------------
+; 2: Data Segment Descriptor
+; -----------------------------
 GDT_DATA_SEG:
-    dw 0xFFFF
-    dw 0x0000
-    db 0x00
-    db 10010010b      ; Access: Data, Writable, Present
-    db 11001111b      ; Flags: 4K granularity, 32-bit
-    db 0x00
+    ; Base = 0x00000000
+    ; Limit = 0xFFFFF
+    ; Writable
 
+    dw 0xFFFF          ; Limit low
+    dw 0x0000          ; Base low
+    db 0x00            ; Base middle
+    db 10010010b       ; Access byte (data segment)
+    db 11001111b       ; Flags + limit high
+    db 0x00            ; Base high
+
+
+; ------------------------------------------------------------
+; GDT Pointer
+; ------------------------------------------------------------
 GDT_END:
 
-; -----------------------------
-; GDT Pointer (usado pelo LGDT)
-; -----------------------------
 GDT_POINTER:
-    dw GDT_END - GDT_START - 1
-    dd GDT_START
+    dw GDT_END - GDT_START - 1   ; Tamanho da GDT
+    dd GDT_START                 ; Endereço da GDT
