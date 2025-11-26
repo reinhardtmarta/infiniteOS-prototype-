@@ -1,4 +1,6 @@
 # InfiniteOS – Makefile FINAL 100% FUNCIONAL (2025)
+# Removidas as variáveis AS/LD de dentro da receita.
+
 all: bin/InfiniteOS.img
 
 # ======= IMAGEM FINAL (vai pro artefato do GitHub Actions) =======
@@ -12,28 +14,31 @@ bin/InfiniteOS.img: kernel.bin
 kernel.bin: kernel.elf
 	objcopy -O binary kernel.elf kernel.bin
 
-# ======= LINKER =======
-kernel.elf: boot/boot.o src/kernel/main.o src/drivers/vga.o
-	ld -m elf_i386 -T boot/linker.ld -o kernel.elf boot/boot.o src/kernel/main.o src/drivers/vga.o
+# ======= LINKER (ATUALIZADO) =======
+# Agora inclui boot.o, gdt.o, interrupts.o e os objetos C
+kernel.elf: boot/boot.o boot/gdt.o boot/interrupts.o src/kernel/main.o src/drivers/vga.o
+	ld -m elf_i386 -T boot/linker.ld -o kernel.elf boot/boot.o boot/gdt.o boot/interrupts.o src/kernel/main.o src/drivers/vga.o
 
-# ======= COMPILAÇÃO =======
+# ======= COMPILAÇÃO C =======
 src/kernel/main.o: src/kernel/main.c
 	gcc -ffreestanding -m32 -march=i386 -c src/kernel/main.c -o src/kernel/main.o
 
 src/drivers/vga.o: src/drivers/vga.c
 	gcc -ffreestanding -m32 -march=i386 -c src/drivers/vga.c -o src/drivers/vga.o
 
+# ======= COMPILAÇÃO ASSEMBLY (NOVAS REGRAS) =======
+
+# 1. Compila o boot.asm
 boot/boot.o: boot/boot.asm
 	nasm -f elf32 boot/boot.asm -o boot/boot.o
-    AS = nasm
-LD = ld
 
-BOOT_SRC = boot.asm
-GDT_SRC = gdt.asm  # <--- NOVO
-INT_SRC = interrupts.asm
+# 2. Compila o gdt.asm (Obrigatório para o linker)
+boot/gdt.o: boot/gdt.asm
+	nasm -f elf32 boot/gdt.asm -o boot/gdt.o
 
-AS_SRCS = $(BOOT_SRC) $(GDT_SRC) $(INT_SRC)
-
+# 3. Compila o interrupts.asm (Obrigatório para o linker)
+boot/interrupts.o: boot/interrupts.asm
+	nasm -f elf32 boot/interrupts.asm -o boot/interrupts.o
 
 # ======= LIMPEZA =======
 clean:
