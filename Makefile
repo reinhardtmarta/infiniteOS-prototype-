@@ -25,6 +25,15 @@ src/drivers/vga.o: src/drivers/vga.c
 
 boot/boot.o: boot/boot.asm
 	nasm -f elf32 boot/boot.asm -o boot/boot.o
+    AS = nasm
+LD = ld
+
+BOOT_SRC = boot.asm
+GDT_SRC = gdt.asm  # <--- NOVO
+INT_SRC = interrupts.asm
+
+AS_SRCS = $(BOOT_SRC) $(GDT_SRC) $(INT_SRC)
+
 
 # ======= LIMPEZA =======
 clean:
