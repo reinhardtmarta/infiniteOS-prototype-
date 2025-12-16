@@ -1,33 +1,49 @@
+; ======================================================
+; infiniteOS — Boot Stage
+; Arquivo: boot/boot.asm
+; Target: ELF32, Protected Mode
+; ======================================================
+
 bits 16
 global _start
 
-extern GDT_START
+; Símbolos externos
 extern GDT_POINTER
-extern GDT_CODE_SEG
-extern GDT_DATA_SEG
+extern kernel_main
 
-CODE_SEG equ GDT_CODE_SEG - GDT_START
-DATA_SEG equ GDT_DATA_SEG - GDT_START
+; Seletores da GDT (índices fixos)
+CODE_SEG equ 0x08
+DATA_SEG equ 0x10
 
+; ------------------------------------------------------
+; Entry point
+; ------------------------------------------------------
 _start:
     cli
+
+    ; Inicializar segmentos em real mode
     xor ax, ax
     mov ds, ax
     mov es, ax
     mov ss, ax
     mov sp, 0x7C00
 
+    ; Carregar GDT
     lgdt [GDT_POINTER]
 
+    ; Ativar Protected Mode
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
 
-    jmp CODE_SEG:Modo_Protegido
+    ; Far jump para limpar pipeline
+    jmp CODE_SEG:protected_mode
 
-; ====================== 32-bit mode ======================
+; ------------------------------------------------------
+; Protected Mode (32-bit)
+; ------------------------------------------------------
 bits 32
-Modo_Protegido:
+protected_mode:
     mov ax, DATA_SEG
     mov ds, ax
     mov es, ax
@@ -35,12 +51,13 @@ Modo_Protegido:
     mov gs, ax
     mov ss, ax
 
+    ; Stack segura
     mov esp, 0x90000
 
-    extern kernel_main
+    ; Chamar kernel C
     call kernel_main
 
-halt:
+.halt:
     cli
     hlt
-    jmp halt
+    jmp .halt
