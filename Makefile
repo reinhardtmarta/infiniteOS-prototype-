@@ -31,6 +31,8 @@ OBJS = \
     src/kernel/idt.o \
     src/drivers/vga/vga.o \
     src/drivers/timer/timer.o
+    src/kernel/paging.o
+
 
 # ----------------------------------------------------------
 # TARGET PRINCIPAL
