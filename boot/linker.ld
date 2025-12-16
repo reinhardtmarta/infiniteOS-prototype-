@@ -1,28 +1,23 @@
-/* linker.ld — Linker Script para InfiniteOS (32-bit) */
+/* linker.ld - Simple linker script for bootable kernel */
 
 ENTRY(_start)
 
 SECTIONS
 {
-    /* Carregar o kernel na memória física 1MB */
-    . = 1M;
+    . = 1M; /* Start from the 1MB mark */
 
-    .text : {
-        *(.multiboot)
-        *(.text*)
+    .text :
+    {
+        *(.text)   /* Collects all text (code) sections */
     }
 
-    .rodata : {
-        *(.rodata*)
+    .data :
+    {
+        *(.data)   /* Collects all data sections */
     }
 
-    .data : {
-        *(.data*)
-    }
-
-    .bss : {
-        *(COMMON)
-        *(.bss*)
-        . = ALIGN(4);
+    .bss :
+    {
+        *(.bss)    /* Collects all uninitialized data */
     }
 }
