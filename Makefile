@@ -29,9 +29,10 @@ OBJS = \
     boot/interrupts.o \
     src/kernel/kernel_main.o \
     src/kernel/idt.o \
+    src/kernel/paging.o
     src/drivers/vga/vga.o \
     src/drivers/timer/timer.o
-    src/kernel/paging.o
+    
 
 
 # ----------------------------------------------------------
