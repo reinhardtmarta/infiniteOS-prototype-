@@ -1,25 +1,23 @@
-name: Build InfiniteOS
+name: InfiniteOS CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Install tools
-      run: sudo apt update && sudo apt install -y nasm qemu-system-x86 gcc make
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y nasm gcc-multilib make
 
-    - name: Build
-      run: make
-
-    - name: Run in QEMU (auto test)
-      run: |
-        timeout 10s qemu-system-i386 -fda bin/InfiniteOS.img -serial stdio -display none || true
-
-    - name: Upload kernel
-      uses: actions/upload-artifact@v4
-      with:
-        name: InfiniteOS-bin
-        path: bin/InfiniteOS.img
+      - name: Build InfiniteOS (CI mode)
+        run: |
+          make clean
+          make CI=1
