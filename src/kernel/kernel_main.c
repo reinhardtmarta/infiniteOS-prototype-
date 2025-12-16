@@ -3,6 +3,17 @@
 #include "idt.h"
 #include "paging.h"
 #include "scheduler.h"
+#include "kernel.h"
+
+void kernel_main(void) {
+    kernel_init();
+
+#ifdef CI_BUILD
+    __asm__("hlt");
+#else
+    while (1) __asm__("hlt");
+#endif
+}
 
 void task_a(void) {
     vga_write("A ");
