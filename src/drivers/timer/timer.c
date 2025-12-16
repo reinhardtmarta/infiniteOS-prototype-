@@ -1,6 +1,16 @@
 #include "timer.h"
 #include "../vga/vga.h"
 
+#include "drivers/timer/timer.h"
+#include "scheduler.h"
+
+static volatile uint32_t ticks = 0;
+
+void timer_handler(void) {
+    ticks++;
+    scheduler_tick();
+}
+
 static volatile uint32_t ticks = 0;
 
 static inline void outb(uint16_t port, uint8_t val) {
