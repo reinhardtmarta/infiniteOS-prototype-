@@ -16,10 +16,14 @@ CFLAGS = -ffreestanding -nostdlib -nodefaultlibs -fno-builtin \
          -Wall -Wextra -O2 \
          -Isrc -Iinclude
 
+ifeq ($(CI),1)
+CFLAGS += -DCI_BUILD
+endif
+
 LDFLAGS = -T boot/linker.ld -m elf_i386
 
 # ----------------------------------------------------------
-# OBJETOS (crescimento fractal)
+# OBJETOS
 # ----------------------------------------------------------
 
 OBJS = \
@@ -30,7 +34,7 @@ OBJS = \
 	src/kernel/kernel_main.o \
 	src/kernel/idt.o \
 	src/kernel/paging.o \
-    src/kernel/scheduler.o \
+	src/kernel/scheduler.o \
 	src/drivers/vga/vga.o \
 	src/drivers/timer/timer.o
 
@@ -44,21 +48,21 @@ kernel.bin: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 
 # ----------------------------------------------------------
-# COMPILAÇÃO ASM
+# ASM
 # ----------------------------------------------------------
 
 boot/%.o: boot/%.asm
 	$(ASM) -f elf32 $< -o $@
 
 # ----------------------------------------------------------
-# COMPILAÇÃO C — kernel
+# C — kernel
 # ----------------------------------------------------------
 
 src/kernel/%.o: src/kernel/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # ----------------------------------------------------------
-# COMPILAÇÃO C — drivers
+# C — drivers
 # ----------------------------------------------------------
 
 src/drivers/%.o: src/drivers/%.c
@@ -70,7 +74,3 @@ src/drivers/%.o: src/drivers/%.c
 
 clean:
 	rm -f $(OBJS) kernel.bin
-
-# ==========================================================
-# FIM
-# ==========================================================
