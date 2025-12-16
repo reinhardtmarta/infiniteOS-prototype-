@@ -23,17 +23,15 @@ LDFLAGS = -T boot/linker.ld -m elf_i386
 # ----------------------------------------------------------
 
 OBJS = \
-    boot/boot.o \
-    boot/gdt.o \
-    boot/idt.o \
-    boot/interrupts.o \
-    src/kernel/kernel_main.o \
-    src/kernel/idt.o \
-    src/kernel/paging.o
-    src/drivers/vga/vga.o \
-    src/drivers/timer/timer.o
-    
-
+	boot/boot.o \
+	boot/gdt.o \
+	boot/idt.o \
+	boot/interrupts.o \
+	src/kernel/kernel_main.o \
+	src/kernel/idt.o \
+	src/kernel/paging.o \
+	src/drivers/vga/vga.o \
+	src/drivers/timer/timer.o
 
 # ----------------------------------------------------------
 # TARGET PRINCIPAL
