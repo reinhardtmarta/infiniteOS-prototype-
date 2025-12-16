@@ -11,7 +11,7 @@ CFLAGS = -ffreestanding -nostdlib -nodefaultlibs -fno-builtin \
          -fno-pie -fno-stack-protector -m32 -march=i386 \
          -Wall -Wextra -O2 -I./include
 
-LDFLAGS = -T linker.ld -m elf_i386
+LDFLAGS = -T boot/linker.ld -m elf_i386
 
 # ----------------------------------------------------------
 # OBJETOS
