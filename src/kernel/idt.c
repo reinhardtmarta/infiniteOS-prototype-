@@ -1,4 +1,8 @@
+#include <stdint.h>
 #include "idt.h"
+
+extern void isr_syscall(void);
+extern void idt_load(void);
 
 struct idt_entry {
     uint16_t offset_low;
@@ -16,28 +20,20 @@ struct idt_ptr {
 static struct idt_entry idt[256];
 static struct idt_ptr idtp;
 
-extern void isr_timer(void);
-
-static void idt_set_gate(int n, uint32_t handler) {
+static void idt_set_gate(int n, uint32_t handler, uint16_t sel, uint8_t flags) {
     idt[n].offset_low  = handler & 0xFFFF;
-    idt[n].selector    = 0x08;     // code segment
+    idt[n].selector    = sel;
     idt[n].zero        = 0;
-    idt[n].type_attr   = 0x8E;     // interrupt gate
-    idt[n].offset_high = handler >> 16;
+    idt[n].type_attr   = flags;
+    idt[n].offset_high = (handler >> 16) & 0xFFFF;
 }
 
 void idt_init(void) {
     idtp.limit = sizeof(idt) - 1;
     idtp.base  = (uint32_t)&idt;
 
-    idt_set_gate(32, (uint32_t)isr_timer); // IRQ0
-
-    __asm__ volatile ("lidt %0" : : "m"(idtp));
-    __asm__ volatile ("sti");
-}
-extern void isr_syscall();
-
-void idt_init(void) {
+    // syscall gate — ring 3 permitido
     idt_set_gate(0x80, (uint32_t)isr_syscall, 0x08, 0xEE);
+
     idt_load();
 }
