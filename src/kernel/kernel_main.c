@@ -3,10 +3,10 @@
 #include "idt.h"
 
 void kernel_main(void) {
-    vga_write("InfiniteOS alive\n");
+    vga_write("InfiniteOS timing online\n");
+
     idt_init();
     timer_init();
-    vga_write("Timer armed\n");
 
     while (1) {
         __asm__("hlt");
