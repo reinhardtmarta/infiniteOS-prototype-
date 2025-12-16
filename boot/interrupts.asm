@@ -9,3 +9,10 @@ global idt_load_ptr ; <--- ADICIONE ISSO!
 idt_load_ptr:
     dw 0x0000 ; Limite (tamanho da IDT - 1)
     dd 0x00000000 ; Endereço base da IDT
+bits 32
+global isr_timer
+
+isr_timer:
+    pusha
+    popa
+    iret
