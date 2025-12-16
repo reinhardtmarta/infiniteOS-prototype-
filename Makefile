@@ -28,7 +28,9 @@ OBJS = \
     boot/idt.o \
     boot/interrupts.o \
     src/kernel/kernel_main.o \
-    src/drivers/vga/vga.o
+    src/kernel/idt.o \
+    src/drivers/vga/vga.o \
+    src/drivers/timer/timer.o
 
 # ----------------------------------------------------------
 # TARGET PRINCIPAL
