@@ -30,6 +30,7 @@ OBJS = \
 	src/kernel/kernel_main.o \
 	src/kernel/idt.o \
 	src/kernel/paging.o \
+    src/kernel/scheduler.o \
 	src/drivers/vga/vga.o \
 	src/drivers/timer/timer.o
 
