@@ -1,11 +1,11 @@
-; ====================== boot/boot.asm ======================
-
 bits 16
 global _start
 
-%include "boot/gdt.asm"
+extern GDT_START
+extern GDT_POINTER
+extern GDT_CODE_SEG
+extern GDT_DATA_SEG
 
-; Seletores da GDT
 CODE_SEG equ GDT_CODE_SEG - GDT_START
 DATA_SEG equ GDT_DATA_SEG - GDT_START
 
@@ -17,15 +17,12 @@ _start:
     mov ss, ax
     mov sp, 0x7C00
 
-    ; Carregar GDT
     lgdt [GDT_POINTER]
 
-    ; Entrar em modo protegido
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
 
-    ; Far jump para 32-bit
     jmp CODE_SEG:Modo_Protegido
 
 ; ====================== 32-bit mode ======================
@@ -47,7 +44,3 @@ halt:
     cli
     hlt
     jmp halt
-
-; ===== Boot signature =====
-times 510-($-$$) db 0
-dw 0xAA55
