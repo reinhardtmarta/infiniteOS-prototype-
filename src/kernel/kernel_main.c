@@ -30,15 +30,10 @@ void kernel_main(void) {
     timer_init();
     paging_init();
 
-#ifdef CI_BUILD
-    vga_write("CI build OK\n");
-    __asm__ volatile ("hlt");
-#else
-    /* Scheduler só roda fora do CI */
+    #ifndef CI_BUILD
     scheduler_init();
     scheduler_add(task_a);
     scheduler_add(task_b);
-    scheduler_run();
 #endif
 
     /* Segurança: nunca retornar */
