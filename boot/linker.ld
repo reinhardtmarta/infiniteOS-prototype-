@@ -1,23 +1,31 @@
-/* linker.ld - Simple linker script for bootable kernel */
+/* linker.ld - Simple linker script for a kernel */
 
-ENTRY(_start)
+ENTRY(_start)  /* Define the entry point */
 
+/* Memory layout sections */
 SECTIONS
 {
-    . = 1M; /* Start from the 1MB mark */
-
+    /* Text (code) section */
     .text :
     {
-        *(.text)   /* Collects all text (code) sections */
+        *(.text)  /* All text (code) sections */
     }
 
+    /* Data section */
     .data :
     {
-        *(.data)   /* Collects all data sections */
+        *(.data)  /* All data sections */
     }
 
+    /* Uninitialized data section (bss) */
     .bss :
     {
-        *(.bss)    /* Collects all uninitialized data */
+        *(.bss)   /* All bss (uninitialized data) sections */
+    }
+
+    /* Stack section */
+    .stack (NOLOAD) :
+    {
+        *(.stack)  /* Stack section if defined */
     }
 }
