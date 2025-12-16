@@ -1,9 +1,13 @@
-bits 32
-global isr_timer
-extern timer_tick
+global isr_syscall
+extern syscall_handler
 
-isr_timer:
+isr_syscall:
     pusha
-    call timer_tick
+    push edx
+    push ecx
+    push ebx
+    push eax
+    call syscall_handler
+    add esp, 20
     popa
-    iret
+    iretd
