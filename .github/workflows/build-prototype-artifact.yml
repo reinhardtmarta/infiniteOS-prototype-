@@ -1,0 +1,64 @@
+name: Build InfiniteOS Prototype Artifact
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Rode manualmente quando quiser
+
+jobs:
+  generate-artifact:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'  # Ajuste se o projeto usar outra versão
+
+      - name: Instala dependências
+        run: |
+          python -m pip install --upgrade pip
+          # Instale o que o projeto precisa – adicione pacotes do requirements.txt se existir
+          # Exemplos comuns para plots e simulações φ/quânticas:
+          pip install numpy matplotlib scipy sympy pandas jupyter nbconvert
+          # Se tiver requirements.txt:
+          # pip install -r requirements.txt
+
+      - name: Executa notebooks e gera outputs (opcional mas recomendado)
+        run: |
+          # Converte notebooks para HTML com outputs (útil para artifact)
+          jupyter nbconvert --to html --execute prototype/*.ipynb --output-dir=outputs/
+          # Ou rode scripts Python principais se existirem
+          # python prototype/simulacao_phi.py --save-plot
+
+      - name: Gera plots e arquivos extras (exemplo)
+        run: |
+          mkdir -p artifacts/plots
+          # Se tiver um script que gera imagens:
+          # python prototype/plot_golden_spiral.py --output artifacts/plots/spiral.png
+          # Ou copie notebooks e outputs
+          cp -r prototype/ artifacts/prototype/
+          cp -r outputs/ artifacts/ || true  # se pasta outputs existir
+
+      - name: Upload Artifact (tudo gerado)
+        uses: actions/upload-artifact@v4
+        with:
+          name: infiniteOS-prototype-artifact
+          path: |
+            artifacts/
+            prototype/
+            *.ipynb
+            *.py
+            requirements.txt
+            README.md
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 6
+
+      - name: Lista arquivos gerados (para debug)
+        run: ls -laR artifacts/ || true
