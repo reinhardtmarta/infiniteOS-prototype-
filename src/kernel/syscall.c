@@ -2,6 +2,7 @@
 #include "scheduler.h"
 
 int syscall_handler(int num, int a, int b, int c) {
+    (void)b; (void)c; // Evita avisos de parâmetros não utilizados
     switch (num) {
         case 1: // SYS_WRITE
             vga_write((const char*)a);

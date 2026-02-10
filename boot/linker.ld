@@ -5,10 +5,12 @@ ENTRY(_start)  /* Define the entry point */
 /* Memory layout sections */
 SECTIONS
 {
-    /* Text (code) section */
+    . = 1M;
+
     .text :
     {
-        *(.text)  /* All text (code) sections */
+        *(.multiboot)
+        *(.text)
     }
 
     /* Data section */

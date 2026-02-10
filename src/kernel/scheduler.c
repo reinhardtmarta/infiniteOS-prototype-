@@ -23,3 +23,14 @@ void scheduler_tick(void) {
     current = (current + 1) % task_count;
     tasks[current]();
 }
+
+void scheduler_yield(void) {
+    scheduler_tick();
+}
+
+void scheduler_exit(void) {
+    // Para um protótipo simples, apenas movemos para a próxima tarefa
+    // e "esquecemos" a atual se possível, ou apenas paramos.
+    // Aqui vamos apenas rotacionar.
+    scheduler_tick();
+}

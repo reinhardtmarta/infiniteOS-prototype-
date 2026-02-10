@@ -23,20 +23,28 @@ void task_b(void) {
  * ------------------------------------------------- */
 
 void kernel_main(void) {
-    vga_write("InfiniteOS booting\n");
+    vga_write("InfiniteOS booting...\n");
 
     /* Inicialização base */
+    vga_write("Initializing IDT...\n");
     idt_init();
+    
+    vga_write("Initializing Timer...\n");
     timer_init();
+    
+    vga_write("Initializing Paging...\n");
     paging_init();
 
-    #ifndef CI_BUILD
+    vga_write("Initializing Scheduler...\n");
     scheduler_init();
     scheduler_add(task_a);
     scheduler_add(task_b);
-#endif
+
+    vga_write("System Ready. Enabling Interrupts...\n");
+    __asm__ volatile ("sti");
 
     /* Segurança: nunca retornar */
+    vga_write("Entering main loop...\n");
     for (;;) {
         __asm__ volatile ("hlt");
     }

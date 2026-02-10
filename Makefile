@@ -35,6 +35,9 @@ OBJS = \
 	src/kernel/idt.o \
 	src/kernel/paging.o \
 	src/kernel/scheduler.o \
+	src/kernel/syscall.o \
+	src/kernel/panic.o \
+	src/kernel/log.o \
 	src/drivers/vga/vga.o \
 	src/drivers/timer/timer.o
 
@@ -46,6 +49,9 @@ all: kernel.bin
 
 kernel.bin: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+
+run: all
+	qemu-system-i386 -kernel kernel.bin -display none -serial stdio
 
 # ----------------------------------------------------------
 # ASM
